@@ -89,7 +89,7 @@ const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezie
 const rnd=(a,b)=>a+Math.random()*(b-a),wait=ms=>new Promise(r=>setTimeout(r,ms));
 const spr=(x,k,w)=>x>=1?1:1-Math.exp(-k*x)*Math.cos(w*x);          /* ressort amorti */
 const kf=(f,n=40)=>Array.from({length:n+1},(_,i)=>f(i/n));
-let chars=[],tx=0,busy=false,specks=0;
+let chars=[],tx=0,busy=false,lock=false,specks=0;
 
 /* ---------- Texte : lettres qui se matérialisent / partent en poussière ---------- */
 function setTx(anim){
@@ -135,7 +135,7 @@ function onInput(){
   rem.slice(0,40).forEach((c,i)=>dust(c.ch,rr[i],mr,i,rem.length));
 }
 q.addEventListener('input',()=>{onInput();if(!RM)flash.animate([{opacity:.14},{opacity:0}],{duration:360,easing:'ease-out'});dock.classList.toggle('v',q.value.length>0)});
-q.addEventListener('beforeinput',e=>{if(busy)e.preventDefault()});
+q.addEventListener('beforeinput',e=>{if(lock)e.preventDefault()});
 ['keyup','pointerup','scroll','select'].forEach(v=>q.addEventListener(v,()=>requestAnimationFrame(()=>setTx(false))));
 q.addEventListener('focus',()=>dock.classList.add('f'));
 q.addEventListener('blur',()=>dock.classList.remove('f'));
@@ -143,50 +143,65 @@ bar.addEventListener('click',e=>{if(e.target!==q&&!go.contains(e.target))q.focus
 go.addEventListener('pointerdown',e=>e.preventDefault());   /* garde le clavier ouvert */
 
 /* ---------- Envoi : la barre se replie en rond, le rond s'envole, la barre ressort ---------- */
-function clear(){q.value='';chars=[];t.textContent='';t.style.transform='';tx=0;dock.classList.remove('v')}
+function clear(k){q.value='';chars=[];t.textContent='';t.style.transform='';tx=0;if(!k)dock.classList.remove('v')}
 bar.addEventListener('submit',async ev=>{
   ev.preventDefault();if(busy)return;
   if(!q.value.trim()){bar.animate([{transform:'none'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:340,easing:EASE});return}
   if(RM){clear();return}
-  busy=true;dock.classList.add('busy','col');
-  const W=bar.offsetWidth;
+  busy=lock=true;dock.classList.add('busy','col');
+  const W=dock.offsetWidth;bar.style.transformOrigin='50% 100%';
   /* 1. le texte est aspiré en poussière vers le bouton */
   chars.forEach((c,i)=>c.el.animate([{opacity:1,transform:'none',filter:'blur(0)'},
     {opacity:0,transform:`translate(${rnd(10,30)}px,${rnd(-14,14)}px) scale(.5)`,filter:'blur(8px)'}],
     {duration:340,delay:Math.min((chars.length-1-i)*10,220),easing:'cubic-bezier(.5,0,.8,.5)',fill:'forwards'}));
-  /* 2. la barre se replie sur le rond (ressort + léger gonflement vertical) */
-  const a1=bar.animate(kf(x=>({width:Math.max(52,W+(62-W)*spr(x,7.5,8))+'px'})),{duration:640,fill:'forwards'});
-  bar.animate(kf(x=>{const w=Math.exp(-5*x)*Math.sin(15*x);return{transform:`scale(${1-.05*w},${1+.1*w})`}}),{duration:640});
+  /* 2. la barre accélère vers le rond, tape, et rebondit (largeur + écrasement) */
+  const A=340,TT=720;
+  const a1=bar.animate(kf(x=>{const u=x*TT;let w,sy;
+    if(u<A){const e=Math.pow(u/A,2.4);w=W+(62-W)*e;sy=1+.05*e}
+    else{const r=(u-A)/1000,o=18*Math.exp(-8*r)*Math.sin(24*r);w=Math.max(54,62+o);sy=1-o*.0035}
+    return{width:w+'px',transform:`scale(1,${sy})`}},60),{duration:TT,fill:'forwards'});
   await a1.finished;
-  bar.style.width='62px';a1.cancel();
-  /* 3. compression, puis le rond décolle avec une traînée de lumière */
-  const d=bar.getBoundingClientRect().bottom+90,L=Math.min(900,520+d*.28),fe='cubic-bezier(.55,.02,.9,.45)';
-  await bar.animate([{transform:'none'},{transform:'translateY(7px) scale(1.16,.84)'}],{duration:150,easing:'ease-out',fill:'forwards'}).finished;
-  const T=[['translateY(7px) scale(1.16,.84)','translateY(7px)'],['translate(-3px,-14px) rotate(-3deg) scale(.82,1.3)','translate(-3px,-14px)'],[`translate(-16px,${-d}px) rotate(-9deg) scale(.72,1.55)`,`translate(-16px,${-d}px)`]];
-  ripple();pulse(1.7);buzz(10);flash.animate([{opacity:0},{opacity:.95,offset:.1},{opacity:0}],{duration:L*.9});
-  const fl=bar.animate([{transform:T[0][0],easing:'cubic-bezier(.2,.8,.3,1)'},{transform:T[1][0],offset:.14,easing:fe},{transform:T[2][0]}],{duration:L,fill:'forwards'});
-  trail.animate([{transform:T[0][1],opacity:0,easing:'cubic-bezier(.2,.8,.3,1)'},{transform:T[1][1],opacity:.9,offset:.14,easing:fe},{transform:T[2][1],opacity:0}],{duration:L,fill:'both'});
-  await fl.finished;
-  bar.style.opacity='0';bar.style.width='62px';
-  bar.getAnimations().forEach(a=>a.cancel());clear();
-  await wait(340);
-  await appear(W);
-  dock.classList.remove('busy');busy=false;
+  bar.style.width='62px';a1.cancel();clear(true);
+  /* 3. le rond se tasse, puis est lancé : trajectoire balistique réelle (gravité + rebonds amortis) */
+  await bar.animate([{transform:'none'},{transform:'scale(1.16,.84)'}],{duration:140,easing:'ease-out',fill:'forwards'}).finished;
+  const d=bar.getBoundingClientRect().bottom+70,g=2800,e=.34,v0=Math.sqrt(2*g*(d+210));
+  const S=[];let tt=0,vv=v0;for(let k=0;k<4;k++){S.push({t:tt,v:vv});tt+=2*vv/g;vv*=e}
+  const N=Math.ceil((tt+.3)*60),F=[],Rr=[];
+  for(let i=0;i<=N;i++){
+    const t=i/60;let k=S.length-1;while(S[k].t>t)k--;
+    const τ=t-S[k].t,y=Math.max(0,S[k].v*τ-.5*g*τ*τ),vel=S[k].v-g*τ;
+    const st=.55*Math.min(1,Math.abs(vel)/v0)*Math.min(1,y/30);
+    let qq=0;if(k>0){const a=.32*Math.pow(S[k-1].v/v0,.7);qq=a*Math.exp(-13*τ)*Math.cos(26*τ)}
+    const sy=(1+st)*(1-qq),sx=(1+.7*qq)/Math.sqrt(1+st),u=Math.min(1,t/S[1].t),x=-14*Math.sin(Math.PI*u),rot=-8*Math.sin(Math.PI*u);
+    F.push({transform:`translate(${x}px,${-y}px) rotate(${rot}deg) scale(${sx},${sy})`});
+    Rr.push({transform:`translate(${x}px,${-y}px)`,opacity:k===0&&vel>0?Math.min(.9,vel/v0):0});
+  }
+  const dur=N*1000/60;
+  const fl=bar.animate(F,{duration:dur,fill:'forwards'});trail.animate(Rr,{duration:dur,fill:'both'});
+  ripple();pulse(1.7);buzz(10);flash.animate([{opacity:0},{opacity:.95,offset:.1},{opacity:0}],{duration:700});
+  [1,2].forEach(k=>setTimeout(()=>{ripple(k===1?.9:.45);buzz(k===1?14:6);if(k===1)pulse(1.35)},S[k].t*1000));
+  await wait(S[2].t*1000);
+  /* 4. au 2e contact, la barre se rouvre en élastique depuis le rond */
+  const ex=expand(W);dock.classList.remove('busy');setTimeout(()=>{lock=false},350);
+  await Promise.all([ex,fl.finished]);
+  bar.getAnimations().forEach(a=>a.cancel());bar.style.transformOrigin='';
+  busy=false;
 });
 
 /* ---------- Effets partagés ---------- */
 const ripple=(k=1)=>ring.animate([{transform:'scale(.85)',opacity:.85*k},{transform:'scale(3.4)',opacity:0}],{duration:800,easing:'cubic-bezier(.1,.6,.2,1)'});
 const pulse=a=>lights.animate([{filter:'brightness(1)'},{filter:`brightness(${a})`,offset:.22},{filter:'brightness(1)'}],{duration:1000,easing:'ease-out'});
 const buzz=n=>navigator.vibrate&&navigator.vibrate(n);
-async function appear(W){
-  bar.style.opacity='';bar.style.transformOrigin='100% 50%';
-  ripple(.7);pulse(1.35);buzz(6);
-  bar.animate([{transform:'scale(.12)',opacity:0},{transform:'scale(1.16)',opacity:1,offset:.5},{transform:'scale(.96)',offset:.75},{transform:'none'}],{duration:480,easing:'cubic-bezier(.3,.7,.3,1)'});
-  await wait(210);
-  dock.classList.remove('col');
+async function expand(W){
+  ripple(.7);pulse(1.3);dock.classList.remove('col','v');
   icon.animate(kf(x=>({transform:`scale(${spr(x,6,9)})`}),30),{duration:600,delay:80,fill:'backwards'});
   const ex=bar.animate(kf(x=>({width:(62+(W-62)*spr(x,6.2,7))+'px'}),48),{duration:900,fill:'forwards'});
-  await ex.finished;bar.style.width='';bar.style.transformOrigin='';ex.cancel();
+  await ex.finished;bar.style.width='';ex.cancel();
+}
+async function appear(W){
+  bar.style.opacity='';bar.style.transformOrigin='100% 50%';buzz(6);
+  bar.animate([{transform:'scale(.12)',opacity:0},{transform:'scale(1.16)',opacity:1,offset:.5},{transform:'scale(.96)',offset:.75},{transform:'none'}],{duration:480,easing:'cubic-bezier(.3,.7,.3,1)'});
+  await wait(210);await expand(W);bar.style.transformOrigin='';
 }
 bar.addEventListener('pointermove',e=>{const r=bar.getBoundingClientRect();shine.style.transform=`translate3d(${e.clientX-r.left-70}px,0,0)`;shine.style.opacity=1},{passive:true});
 bar.addEventListener('pointerleave',()=>shine.style.opacity=0);
@@ -197,8 +212,8 @@ function follow(){raf=0;if(!vv)return;const kb=Math.max(0,Math.round(innerHeight
 const sched=()=>{if(!raf)raf=requestAnimationFrame(follow)};
 if(vv){vv.addEventListener('resize',sched);vv.addEventListener('scroll',sched)}
 scrollTo(0,0);
-if(!RM)(async()=>{busy=true;dock.classList.add('busy','col');bar.style.width='62px';bar.style.opacity='0';
-  await wait(400);await appear(dock.offsetWidth);dock.classList.remove('busy');busy=false})();
+if(!RM)(async()=>{busy=lock=true;dock.classList.add('busy','col');bar.style.width='62px';bar.style.opacity='0';
+  await wait(400);await appear(dock.offsetWidth);dock.classList.remove('busy');busy=lock=false})();
 </script>
 </body>
 </html>
