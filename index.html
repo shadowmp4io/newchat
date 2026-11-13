@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#08090d">
+<title>ShadowZ</title>
+<style>
+:root{color-scheme:dark;--bg:#08090d;--kb:0px;--safe:env(safe-area-inset-bottom,0px);--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.45,.5,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{font:500 16px/50px system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+.lights{position:fixed;inset:0;overflow:hidden;pointer-events:none;contain:strict}
+.lights i{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+.lights i:nth-child(1){width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,#4a2bd6 0%,transparent 65%);opacity:.5;animation:d1 26s ease-in-out infinite alternate}
+.lights i:nth-child(2){width:58vmax;height:58vmax;right:-26vmax;top:15vh;background:radial-gradient(circle,#c4283f 0%,transparent 65%);opacity:.32;animation:d2 32s ease-in-out infinite alternate}
+.lights i:nth-child(3){width:55vmax;height:55vmax;left:5vmax;bottom:-30vmax;background:radial-gradient(circle,#1f6fff 0%,transparent 65%);opacity:.26;animation:d3 38s ease-in-out infinite alternate}
+.lights::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,transparent 30%,rgba(8,9,13,.75) 100%)}
+@keyframes d1{to{transform:translate3d(12vmax,9vmax,0) scale(1.1)}}
+@keyframes d2{to{transform:translate3d(-14vmax,-7vmax,0) scale(.92)}}
+@keyframes d3{to{transform:translate3d(9vmax,-9vmax,0) scale(1.12)}}
+
+.dock{position:fixed;left:50%;bottom:calc(var(--safe) + 16px);z-index:10;width:min(520px,100% - 28px);height:62px;
+  transform:translate3d(-50%,calc(var(--kb) * -1),0);transition:transform .38s var(--ease),bottom .3s var(--ease);will-change:transform}
+.dock.kb{bottom:10px}
+.bar{position:relative;display:flex;align-items:center;width:100%;height:62px;margin-left:auto;padding:0 6px 0 0;border-radius:999px;isolation:isolate;cursor:text;
+  background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1));
+  -webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.08),inset 0 0 22px rgba(255,255,255,.04),0 18px 40px -10px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.3);
+  transition:box-shadow .4s}
+.bar::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background:radial-gradient(120% 90% at 20% -30%,rgba(255,255,255,.28),transparent 55%)}
+.dock.f .bar{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(255,255,255,.1),0 22px 46px -10px rgba(0,0,0,.7),0 0 44px -6px rgba(122,92,255,.45)}
+.dock.busy .bar{pointer-events:none}
+.ico,.field{transition:opacity .22s}
+.dock.col .ico,.dock.col .field{opacity:0}
+.ico{flex:0 1 54px;min-width:0;height:50px;display:grid;place-items:center;overflow:hidden}
+.ico svg{width:22px;height:22px;fill:none;stroke:rgba(255,255,255,.85);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.field{position:relative;flex:1 1 0;min-width:0;height:50px}
+.field *,input{font:inherit;font-kerning:none;font-variant-ligatures:none;font-feature-settings:"kern" 0,"liga" 0,"calt" 0;text-rendering:optimizeSpeed;letter-spacing:0}
+input{position:absolute;inset:0;width:100%;height:50px;line-height:50px;padding:0 12px 0 8px;background:transparent;border:0;border-radius:0;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none;
+  color:transparent;caret-color:#fff;font-size:16px;font-weight:500}
+input:focus,input:focus-visible{outline:none}
+input::placeholder{color:rgba(255,255,255,.45)}
+input::selection{background:rgba(122,92,255,.45);color:transparent}
+input::-webkit-search-cancel-button,input::-webkit-search-decoration{display:none;-webkit-appearance:none}
+.mir{position:absolute;left:0;right:0;top:50%;height:140px;transform:translateY(-50%);pointer-events:none;overflow:hidden;display:flex;align-items:center;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8px,#000 calc(100% - 12px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 8px,#000 calc(100% - 12px),transparent 100%)}
+.t{white-space:pre;padding-left:8px;height:50px;font-size:16px}
+.c{display:inline-block;white-space:pre}
+.g{position:absolute;white-space:pre;height:50px;font-size:16px;will-change:transform,opacity,filter}
+.p{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;filter:blur(.6px);box-shadow:0 0 6px rgba(190,170,255,.9)}
+.go{flex:0 0 48px;height:48px;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#0a0b10;
+  background:linear-gradient(180deg,#fff,#d9d6e6);box-shadow:inset 0 1px 0 #fff,0 6px 16px -6px rgba(0,0,0,.6);
+  transform:scale(.4);opacity:0;pointer-events:none;transition:transform .5s var(--spring),opacity .25s}
+.go svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.dock.v .go{transform:scale(1);opacity:1;pointer-events:auto}
+.go:active{transform:scale(.9)!important}
+.go:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.trail{position:absolute;right:20px;top:31px;width:22px;height:140px;border-radius:999px;pointer-events:none;opacity:0;filter:blur(7px);
+  background:linear-gradient(180deg,rgba(200,180,255,.8),rgba(122,92,255,.25) 45%,transparent)}
+</style>
+</head>
+<body>
+<div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="dock" id="dock">
+  <div class="trail" id="trail" aria-hidden="true"></div>
+  <form class="bar" id="bar" role="search">
+    <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></span>
+    <div class="field">
+      <input id="q" type="search" aria-label="Rechercher" placeholder="Rechercher" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
+      <div class="mir" id="mir" aria-hidden="true"><div class="t" id="t"></div></div>
+    </div>
+    <button class="go" id="go" type="submit" aria-label="Envoyer"><svg viewBox="0 0 24 24"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></button>
+  </form>
+</div>
+
+<script>
+const $=i=>document.getElementById(i),dock=$('dock'),bar=$('bar'),q=$('q'),t=$('t'),mir=$('mir'),go=$('go'),trail=$('trail');
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezier(.22,1,.36,1)';
+const rnd=(a,b)=>a+Math.random()*(b-a),wait=ms=>new Promise(r=>setTimeout(r,ms));
+const spr=(x,k,w)=>x>=1?1:1-Math.exp(-k*x)*Math.cos(w*x);          /* ressort amorti */
+const kf=(f,n=40)=>Array.from({length:n+1},(_,i)=>f(i/n));
+let chars=[],tx=0,busy=false,specks=0;
+
+/* ---------- Texte : lettres qui se matérialisent / partent en poussière ---------- */
+function setTx(anim){
+  const n=-q.scrollLeft;if(Math.abs(n-tx)<.4)return;
+  if(anim&&!RM)t.animate([{transform:`translateX(${tx}px)`},{transform:`translateX(${n}px)`}],{duration:220,easing:EASE});
+  t.style.transform=`translateX(${n}px)`;tx=n;
+}
+function dust(ch,r,mr,i,n){
+  const g=document.createElement('span');g.className='g';g.textContent=ch;
+  g.style.cssText=`left:${r.left-mr.left}px;top:${r.top-mr.top}px`;mir.appendChild(g);
+  const dl=Math.min(i*14,160);
+  g.animate([{opacity:1,transform:'none',filter:'blur(0)'},{opacity:.55,offset:.35},
+    {opacity:0,transform:`translate(${rnd(-8,16)}px,${-rnd(14,32)}px) scale(${rnd(1.1,1.5)}) rotate(${rnd(-14,14)}deg)`,filter:'blur(9px)'}],
+    {duration:rnd(480,700),delay:dl,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}).onfinish=()=>g.remove();
+  if(n<=10&&ch.trim())for(let k=0;k<3&&specks<90;k++){
+    specks++;const p=document.createElement('i');p.className='p';
+    p.style.cssText=`left:${r.left-mr.left+r.width/2+rnd(-4,4)}px;top:${r.top-mr.top+25+rnd(-9,9)}px`;mir.appendChild(p);
+    p.animate([{opacity:.9,transform:'none'},{opacity:0,transform:`translate(${rnd(-6,22)}px,${-rnd(10,34)}px) scale(.3)`}],
+      {duration:rnd(550,900),delay:dl,easing:'cubic-bezier(.15,.6,.3,1)',fill:'both'}).onfinish=()=>{p.remove();specks--};
+  }
+}
+function onInput(){
+  const next=Array.from(q.value),prev=chars.map(c=>c.ch);
+  let s=0;while(s<prev.length&&s<next.length&&prev[s]===next[s])s++;
+  let e=0;while(e<prev.length-s&&e<next.length-s&&prev[prev.length-1-e]===next[next.length-1-e])e++;
+  const rem=chars.slice(s,chars.length-e),suf=chars.slice(chars.length-e),ins=next.slice(s,next.length-e);
+  const mr=mir.getBoundingClientRect();
+  const rr=RM?[]:rem.slice(0,40).map(c=>c.el.getBoundingClientRect());
+  const first=suf.length<=120?suf.map(c=>c.el.getBoundingClientRect().left):[];
+  rem.forEach(c=>c.el.remove());
+  const frag=document.createDocumentFragment(),ne=ins.map(ch=>{const el=document.createElement('span');el.className='c';el.textContent=ch;frag.appendChild(el);return{ch,el}});
+  t.insertBefore(frag,suf.length?suf[0].el:null);
+  chars=[...chars.slice(0,s),...ne,...suf];
+  setTx(true);
+  if(RM)return;
+  suf.forEach((c,i)=>{if(first[i]==null)return;c.el.getAnimations().forEach(a=>a.cancel());
+    const d=first[i]-c.el.getBoundingClientRect().left;
+    if(Math.abs(d)>.5)c.el.animate([{transform:`translateX(${d}px)`},{transform:'none'}],{duration:260,easing:EASE})});
+  if(ne.length<=40)ne.forEach((c,i)=>c.el.animate([
+    {opacity:0,transform:'translateY(8px) scale(.8)',filter:'blur(8px)',textShadow:'0 0 14px #fff'},
+    {opacity:1,transform:'none',filter:'blur(0)',textShadow:'0 0 0 transparent'}],
+    {duration:340,delay:Math.min(i*16,200),easing:EASE,fill:'backwards'}));
+  rem.slice(0,40).forEach((c,i)=>dust(c.ch,rr[i],mr,i,rem.length));
+}
+q.addEventListener('input',()=>{onInput();dock.classList.toggle('v',q.value.length>0)});
+q.addEventListener('beforeinput',e=>{if(busy)e.preventDefault()});
+['keyup','pointerup','scroll','select'].forEach(v=>q.addEventListener(v,()=>requestAnimationFrame(()=>setTx(false))));
+q.addEventListener('focus',()=>dock.classList.add('f'));
+q.addEventListener('blur',()=>dock.classList.remove('f'));
+bar.addEventListener('click',e=>{if(e.target!==q&&!go.contains(e.target))q.focus({preventScroll:true})});
+go.addEventListener('pointerdown',e=>e.preventDefault());   /* garde le clavier ouvert */
+
+/* ---------- Envoi : la barre se replie en rond, le rond s'envole, la barre ressort ---------- */
+function clear(){q.value='';chars=[];t.textContent='';t.style.transform='';tx=0;dock.classList.remove('v')}
+bar.addEventListener('submit',async ev=>{
+  ev.preventDefault();if(busy)return;
+  if(!q.value.trim()){bar.animate([{transform:'none'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:340,easing:EASE});return}
+  if(RM){clear();return}
+  busy=true;dock.classList.add('busy','col');
+  const W=bar.offsetWidth;
+  /* 1. le texte est aspiré en poussière vers le bouton */
+  chars.forEach((c,i)=>c.el.animate([{opacity:1,transform:'none',filter:'blur(0)'},
+    {opacity:0,transform:`translate(${rnd(10,30)}px,${rnd(-14,14)}px) scale(.5)`,filter:'blur(8px)'}],
+    {duration:340,delay:Math.min((chars.length-1-i)*10,220),easing:'cubic-bezier(.5,0,.8,.5)',fill:'forwards'}));
+  /* 2. la barre se replie sur le rond (ressort + léger gonflement vertical) */
+  const a1=bar.animate(kf(x=>({width:Math.max(52,W+(62-W)*spr(x,7.5,8))+'px'})),{duration:640,fill:'forwards'});
+  bar.animate(kf(x=>{const w=Math.exp(-5*x)*Math.sin(15*x);return{transform:`scale(${1-.05*w},${1+.1*w})`}}),{duration:640});
+  await a1.finished;
+  bar.style.width='62px';a1.cancel();
+  /* 3. compression, puis le rond décolle avec une traînée de lumière */
+  const d=bar.getBoundingClientRect().bottom+90,L=Math.min(900,520+d*.28),fe='cubic-bezier(.55,.02,.9,.45)';
+  await bar.animate([{transform:'none'},{transform:'translateY(7px) scale(1.16,.84)'}],{duration:150,easing:'ease-out',fill:'forwards'}).finished;
+  const T=[['translateY(7px) scale(1.16,.84)','translateY(7px)'],['translateY(-14px) scale(.82,1.3)','translateY(-14px)'],[`translateY(${-d}px) scale(.72,1.55)`,`translateY(${-d}px)`]];
+  const fl=bar.animate([{transform:T[0][0],easing:'cubic-bezier(.2,.8,.3,1)'},{transform:T[1][0],offset:.14,easing:fe},{transform:T[2][0]}],{duration:L,fill:'forwards'});
+  trail.animate([{transform:T[0][1],opacity:0,easing:'cubic-bezier(.2,.8,.3,1)'},{transform:T[1][1],opacity:.9,offset:.14,easing:fe},{transform:T[2][1],opacity:0}],{duration:L,fill:'both'});
+  await fl.finished;
+  /* 4. le rond a disparu : on remet tout à zéro hors de vue */
+  bar.style.opacity='0';bar.style.width='62px';bar.style.transformOrigin='100% 50%';
+  bar.getAnimations().forEach(a=>a.cancel());clear();
+  await wait(260);
+  /* 5. un nouveau rond apparaît, puis la barre ressort en élastique */
+  bar.style.opacity='';
+  bar.animate([{transform:'scale(.15)',opacity:0},{transform:'scale(1.14)',opacity:1,offset:.55},{transform:'scale(.97)',offset:.8},{transform:'none'}],{duration:420,easing:'cubic-bezier(.3,.7,.3,1)'});
+  await wait(190);
+  dock.classList.remove('col');
+  const ex=bar.animate(kf(x=>({width:(62+(W-62)*spr(x,6.5,7.2))+'px'})),{duration:820,fill:'forwards'});
+  await ex.finished;
+  bar.style.width='';bar.style.transformOrigin='';ex.cancel();
+  dock.classList.remove('busy');busy=false;
+});
+
+/* ---------- La barre suit le clavier mobile ---------- */
+const vv=window.visualViewport;let raf=0;
+function follow(){raf=0;if(!vv)return;const kb=Math.max(0,Math.round(innerHeight-vv.height-vv.offsetTop));
+  dock.style.setProperty('--kb',kb+'px');dock.classList.toggle('kb',kb>80)}
+const sched=()=>{if(!raf)raf=requestAnimationFrame(follow)};
+if(vv){vv.addEventListener('resize',sched);vv.addEventListener('scroll',sched)}
+scrollTo(0,0);
+</script>
+</body>
+</html>
