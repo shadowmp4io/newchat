@@ -21,23 +21,22 @@ body{font:500 16px/50px system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff
 @keyframes d2{to{transform:translate3d(-14vmax,-7vmax,0) scale(.92)}}
 @keyframes d3{to{transform:translate3d(9vmax,-9vmax,0) scale(1.12)}}
 
-.dock{position:fixed;left:50%;bottom:calc(var(--safe) + 16px);z-index:10;width:min(520px,100% - 28px);height:62px;
+.dock{contain:layout style;position:fixed;left:50%;bottom:calc(var(--safe) + 16px);z-index:10;width:min(520px,100% - 28px);height:62px;
   transform:translate3d(-50%,calc(var(--kb) * -1),0);transition:transform .38s var(--ease),bottom .3s var(--ease);will-change:transform}
 .dock.kb{bottom:10px}
 .bar{position:relative;display:flex;align-items:center;width:100%;height:62px;margin-left:auto;padding:0 6px 0 0;border-radius:999px;isolation:isolate;cursor:text;
   background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1));
-  -webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%);
+  -webkit-backdrop-filter:blur(18px) saturate(185%);backdrop-filter:blur(18px) saturate(185%);
   border:1px solid rgba(255,255,255,.16);
   box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.08),inset 0 0 22px rgba(255,255,255,.04),0 18px 40px -10px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.3);
-  transition:box-shadow .4s,transform .35s var(--spring)}
+  transition:transform .35s var(--spring)}
 .bar:active{transform:scale(.988)}
 .bar::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;background:radial-gradient(120% 90% at 20% -30%,rgba(255,255,255,.28),transparent 55%)}
-.dock.f .bar{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(255,255,255,.1),0 22px 46px -10px rgba(0,0,0,.7),0 0 44px -6px rgba(122,92,255,.45)}
 .dock.busy .bar{pointer-events:none}
 .flash,.shine{position:absolute;z-index:-1;pointer-events:none;opacity:0}
 .flash{inset:0;border-radius:inherit;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.8),rgba(190,170,255,.3) 45%,transparent 75%)}
 .shine{left:0;top:0;width:140px;height:100%;border-radius:inherit;transition:opacity .4s,transform .18s ease-out;background:radial-gradient(closest-side,rgba(255,255,255,.2),transparent)}
-.ring{position:absolute;right:0;bottom:0;width:62px;height:62px;border-radius:50%;pointer-events:none;opacity:0;border:1.5px solid rgba(200,180,255,.8);box-shadow:0 0 24px rgba(122,92,255,.55),inset 0 0 20px rgba(122,92,255,.25)}
+.ring{will-change:transform,opacity;position:absolute;right:0;bottom:0;width:62px;height:62px;border-radius:50%;pointer-events:none;opacity:0;border:1.5px solid rgba(200,180,255,.8);box-shadow:0 0 24px rgba(122,92,255,.55),inset 0 0 20px rgba(122,92,255,.25)}
 .ico,.field{transition:opacity .4s .12s}
 .dock.col .ico,.dock.col .field{opacity:0;transition:opacity .2s}
 .ico{flex:0 1 54px;min-width:0;height:50px;display:grid;place-items:center;overflow:hidden}
@@ -68,44 +67,44 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration{display:non
 
 @property --a{syntax:'<angle>';initial-value:0deg;inherits:false}
 .grid{position:fixed;inset:-40px;pointer-events:none;background:radial-gradient(rgba(255,255,255,.17) 1px,transparent 1.5px) 0 0/40px 40px;
-  -webkit-mask-image:radial-gradient(ellipse 85% 60% at 50% 100%,#000,transparent);mask-image:radial-gradient(ellipse 85% 60% at 50% 100%,#000,transparent);animation:gr 18s linear infinite;will-change:transform}
+  -webkit-mask-image:radial-gradient(ellipse 85% 60% at 50% 100%,#000,transparent);mask-image:radial-gradient(ellipse 85% 60% at 50% 100%,#000,transparent);}
 @keyframes gr{to{transform:translate3d(40px,40px,0)}}
 .lens .bar{-webkit-backdrop-filter:blur(2px) url(#lens) saturate(165%) brightness(1.1);backdrop-filter:blur(2px) url(#lens) saturate(165%) brightness(1.1)}
 .bar::after{content:"";position:absolute;inset:-1px;border-radius:inherit;border:2px solid #ff3a4f;pointer-events:none;box-shadow:inset 0 0 16px rgba(255,58,79,.4);
   --a:0deg;-webkit-mask:conic-gradient(#000 var(--a),transparent 0);mask:conic-gradient(#000 var(--a),transparent 0);transition:--a .43s cubic-bezier(.3,.7,.2,1)}
 .dock.arm .bar::after{--a:360deg}
-.dock.del .bar{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(255,255,255,.1),0 22px 46px -10px rgba(0,0,0,.7),0 0 46px -6px rgba(255,58,79,.55)}
 .go .tr,.orb .up{display:none}
 .dock.del .go .tr,.orb:not(.w) .tr{display:block}
 .dock.del .go .up,.orb:not(.w) .up{display:none}
 .orb.w .up{display:block}.orb.w .tr{display:none}
 .dock.del .go{background:linear-gradient(180deg,#ff5468,#e0223a);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 18px -4px rgba(255,58,79,.6)}
-.orb{position:absolute;left:0;top:0;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;opacity:0;pointer-events:none;color:#fff;
+.orb{will-change:transform,opacity;position:absolute;left:0;top:0;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;opacity:0;pointer-events:none;color:#fff;
   background:linear-gradient(180deg,#ff5468,#e0223a);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 18px -4px rgba(255,58,79,.6)}
 .orb.w{background:linear-gradient(180deg,#fff,#d9d6e6);color:#0a0b10;box-shadow:inset 0 1px 0 #fff,0 6px 16px -6px rgba(0,0,0,.6)}
 .orb svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .trash{position:absolute;right:7px;bottom:2px;overflow:visible;opacity:0;pointer-events:none;fill:rgba(255,255,255,.07);stroke:#ff6b7b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(255,58,79,.5))}
 #lid{fill:none;transform-origin:8px 14px}
+
+.halo{position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;opacity:0;transition:opacity .4s;box-shadow:0 0 44px -6px rgba(122,92,255,.55)}
+.halo.r{box-shadow:0 0 46px -6px rgba(255,58,79,.65)}
+.dock.f .halo.v{opacity:1}.dock.del .halo.v{opacity:0}.dock.del .halo.r{opacity:1}
+.flare{position:fixed;left:0;right:0;bottom:0;height:60vh;pointer-events:none;opacity:0;will-change:opacity;background:radial-gradient(70% 70% at 50% 100%,rgba(150,120,255,.55),transparent 70%)}
+.low .grid,.low .lights i:nth-child(3){display:none}
+.low .bar{-webkit-backdrop-filter:blur(10px) saturate(150%);backdrop-filter:blur(10px) saturate(150%)}
+.low .trail,.low .p{filter:none}.low .lights i{animation-duration:70s}
 </style>
 </head>
 <body>
 <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="grid" aria-hidden="true"></div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lens" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-<feImage id="map" preserveAspectRatio="none" result="m"/>
-<feDisplacementMap in="SourceGraphic" in2="m" scale="26" xChannelSelector="R" yChannelSelector="G" result="r"/>
-<feDisplacementMap in="SourceGraphic" in2="m" scale="32" xChannelSelector="R" yChannelSelector="G" result="g"/>
-<feDisplacementMap in="SourceGraphic" in2="m" scale="38" xChannelSelector="R" yChannelSelector="G" result="b"/>
-<feColorMatrix in="r" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="R"/>
-<feColorMatrix in="g" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" result="G"/>
-<feColorMatrix in="b" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="B"/>
-<feBlend in="R" in2="G" mode="screen" result="rg"/><feBlend in="rg" in2="B" mode="screen"/></filter></svg>
+<div class="flare" id="flare" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="lens" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feImage id="map" preserveAspectRatio="none" result="m"/><feDisplacementMap in="SourceGraphic" in2="m" scale="30" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <div class="dock" id="dock">
   <div class="ring" id="ring" aria-hidden="true"></div>
   <svg class="trash" id="trash" viewBox="0 0 48 58" width="48" height="58" aria-hidden="true"><path d="M9 19l2.5 30a4 4 0 0 0 4 3.6h17a4 4 0 0 0 4-3.6L39 19z"/><path d="M20 27v17M28 27v17"/><g id="lid"><path d="M5 13h38M18 13V9a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v4"/></g></svg>
   <div class="trail" id="trail" aria-hidden="true"></div>
   <form class="bar" id="bar" role="search">
-    <span class="flash" id="flash"></span><span class="shine" id="shine"></span>
+    <span class="halo v"></span><span class="halo r"></span><span class="flash" id="flash"></span><span class="shine" id="shine"></span>
     <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></span>
     <div class="field">
       <input id="q" type="search" aria-label="Rechercher" placeholder="Rechercher" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
@@ -117,12 +116,12 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration{display:non
 </div>
 
 <script>
-const $=i=>document.getElementById(i),dock=$('dock'),bar=$('bar'),q=$('q'),t=$('t'),mir=$('mir'),go=$('go'),trail=$('trail'),ring=$('ring'),flash=$('flash'),shine=$('shine'),lights=document.querySelector('.lights'),icon=document.querySelector('.ico svg'),trash=$('trash'),lid=$('lid'),orb=$('orb');
+const $=i=>document.getElementById(i),dock=$('dock'),bar=$('bar'),q=$('q'),t=$('t'),mir=$('mir'),go=$('go'),trail=$('trail'),ring=$('ring'),flash=$('flash'),shine=$('shine'),flare=$('flare'),icon=document.querySelector('.ico svg'),trash=$('trash'),lid=$('lid'),orb=$('orb');
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezier(.22,1,.36,1)';
 const rnd=(a,b)=>a+Math.random()*(b-a),wait=ms=>new Promise(r=>setTimeout(r,ms));
 const spr=(x,k,w)=>x>=1?1:1-Math.exp(-k*x)*Math.cos(w*x);          /* ressort amorti */
 const kf=(f,n=40)=>Array.from({length:n+1},(_,i)=>f(i/n));
-let chars=[],tx=0,busy=false,lock=false,specks=0;
+let chars=[],tx=0,busy=false,lock=false,specks=0,lowPerf=false;
 
 /* ---------- Texte : lettres qui se matérialisent / partent en poussière ---------- */
 function setTx(anim){
@@ -137,7 +136,7 @@ function dust(ch,r,mr,i,n){
   g.animate([{opacity:1,transform:'none',filter:'blur(0)'},{opacity:.55,offset:.35},
     {opacity:0,transform:`translate(${rnd(-8,16)}px,${-rnd(14,32)}px) scale(${rnd(1.1,1.5)}) rotate(${rnd(-14,14)}deg)`,filter:'blur(9px)'}],
     {duration:rnd(480,700),delay:dl,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}).onfinish=()=>g.remove();
-  if(n<=10&&ch.trim())for(let k=0;k<3&&specks<90;k++){
+  if(n<=8&&ch.trim()&&!lowPerf)for(let k=0;k<2&&specks<50;k++){
     specks++;const p=document.createElement('i');p.className='p';
     p.style.cssText=`left:${r.left-mr.left+r.width/2+rnd(-4,4)}px;top:${r.top-mr.top+25+rnd(-9,9)}px`;mir.appendChild(p);
     p.animate([{opacity:.9,transform:'none'},{opacity:0,transform:`translate(${rnd(-6,22)}px,${-rnd(10,34)}px) scale(.3)`}],
@@ -162,10 +161,10 @@ function onInput(){
     const d=first[i]-c.el.getBoundingClientRect().left;
     if(Math.abs(d)>.5)c.el.animate([{transform:`translateX(${d}px)`},{transform:'none'}],{duration:260,easing:EASE})});
   if(ne.length<=40)ne.forEach((c,i)=>c.el.animate([
-    {opacity:0,transform:'translate(-8px,5px) scale(1.3,.8)',filter:'blur(8px)',textShadow:'0 0 14px #fff'},
-    {opacity:1,transform:'none',filter:'blur(0)',textShadow:'0 0 0 transparent'}],
+    {opacity:0,transform:'translate(-8px,5px) scale(1.3,.8)',filter:'blur(8px)'},
+    {opacity:1,transform:'none',filter:'blur(0)'}],
     {duration:340,delay:Math.min(i*16,200),easing:EASE,fill:'backwards'}));
-  rem.slice(0,40).forEach((c,i)=>dust(c.ch,rr[i],mr,i,rem.length));
+  rem.slice(0,24).forEach((c,i)=>dust(c.ch,rr[i],mr,i,rem.length));
 }
 q.addEventListener('input',()=>{if(inDel())exitDel();onInput();if(!RM)flash.animate([{opacity:.14},{opacity:0}],{duration:360,easing:'ease-out'});dock.classList.toggle('v',q.value.length>0)});
 q.addEventListener('beforeinput',e=>{if(lock)e.preventDefault()});
@@ -192,7 +191,7 @@ bar.addEventListener('submit',async ev=>{
   ev.preventDefault();if(sup){sup=false;return}if(busy)return;if(inDel()){discard();return}
   if(!q.value.trim()){bar.animate([{transform:'none'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'none'}],{duration:340,easing:EASE});return}
   if(RM){clear();return}
-  busy=lock=true;dock.classList.add('busy','col');
+  busy=lock=true;dock.classList.add('busy','col');watch(2600);
   const W=dock.offsetWidth;bar.style.transformOrigin='50% 100%';
   dustAll();await collapse(W);clear(true);
   /* 3. le rond se tasse, puis est lancé : trajectoire balistique réelle (gravité + rebonds amortis) */
@@ -232,7 +231,7 @@ document.addEventListener('pointerdown',e=>{if(inDel()&&!busy&&!go.contains(e.ta
 q.addEventListener('keydown',e=>{if(inDel()&&(e.key==='Enter'||e.key==='Escape')){e.preventDefault();exitDel()}});
 async function discard(){
   if(RM){clear();exitDel();return}
-  busy=lock=true;dock.classList.add('busy','col');
+  busy=lock=true;dock.classList.add('busy','col');watch(2600);
   const W=dock.offsetWidth;bar.style.transformOrigin='50% 100%';bar.style.marginLeft='0';bar.style.marginRight='auto';
   lid.style.transform='rotate(-30deg)';
   dustAll();await collapse(W);clear(true);
@@ -268,9 +267,14 @@ async function discard(){
   Object.assign(bar.style,{transformOrigin:'',marginLeft:'',marginRight:''});busy=false;
 }
 
+/* ---------- Qualité adaptative : si ça rame, on allège tout seul ---------- */
+function goLow(){if(lowPerf)return;lowPerf=true;document.documentElement.classList.remove('lens');document.documentElement.classList.add('low')}
+function watch(ms){if(lowPerf)return;let last=performance.now(),n=0,slow=0;const end=last+ms;
+  requestAnimationFrame(function f(t){const dt=t-last;last=t;if(dt<200){n++;if(dt>26)slow++}
+    if(t<end)requestAnimationFrame(f);else if(n>25&&slow/n>.2)goLow()})}
 /* ---------- Effets partagés ---------- */
 const ripple=(k=1)=>ring.animate([{transform:'scale(.85)',opacity:.85*k},{transform:'scale(3.4)',opacity:0}],{duration:800,easing:'cubic-bezier(.1,.6,.2,1)'});
-const pulse=a=>lights.animate([{filter:'brightness(1)'},{filter:`brightness(${a})`,offset:.22},{filter:'brightness(1)'}],{duration:1000,easing:'ease-out'});
+const pulse=a=>flare.animate([{opacity:0},{opacity:Math.min(.9,a*.35),offset:.22},{opacity:0}],{duration:1000,easing:'ease-out'});
 const buzz=n=>navigator.vibrate&&navigator.vibrate(n);
 async function expand(W){
   ripple(.7);pulse(1.3);dock.classList.remove('col','v');
@@ -283,7 +287,8 @@ async function appear(W){
   bar.animate([{transform:'scale(.12)',opacity:0},{transform:'scale(1.16)',opacity:1,offset:.5},{transform:'scale(.96)',offset:.75},{transform:'none'}],{duration:480,easing:'cubic-bezier(.3,.7,.3,1)'});
   await wait(210);await expand(W);bar.style.transformOrigin='';
 }
-bar.addEventListener('pointermove',e=>{const r=bar.getBoundingClientRect();shine.style.transform=`translate3d(${e.clientX-r.left-70}px,0,0)`;shine.style.opacity=1},{passive:true});
+let px=0,pr=0;
+bar.addEventListener('pointermove',e=>{px=e.clientX;if(pr)return;pr=requestAnimationFrame(()=>{pr=0;const r=bar.getBoundingClientRect();shine.style.transform=`translate3d(${px-r.left-70}px,0,0)`;shine.style.opacity=1})},{passive:true});
 bar.addEventListener('pointerleave',()=>shine.style.opacity=0);
 /* ---------- La barre suit le clavier mobile ---------- */
 const vv=window.visualViewport;let raf=0;
@@ -291,12 +296,12 @@ function follow(){raf=0;if(!vv)return;const kb=Math.max(0,Math.round(innerHeight
   dock.style.setProperty('--kb',kb+'px');dock.classList.toggle('kb',kb>80)}
 const sched=()=>{if(!raf)raf=requestAnimationFrame(follow)};
 if(vv){vv.addEventListener('resize',sched);vv.addEventListener('scroll',sched)}
-if(/Chrome\//.test(navigator.userAgent)&&!/CriOS/.test(navigator.userAgent)){
+if(/Chrome\//.test(navigator.userAgent)&&!/CriOS/.test(navigator.userAgent)&&(navigator.hardwareConcurrency||4)>=6&&(navigator.deviceMemory||4)>=4){
   const m="<svg xmlns='http://www.w3.org/2000/svg' width='200' height='100'><defs><linearGradient id='h'><stop offset='0' stop-color='#f00'/><stop offset='.22' stop-color='#800'/><stop offset='.78' stop-color='#800'/><stop offset='1' stop-color='#000'/></linearGradient><linearGradient id='v' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#0f0'/><stop offset='.3' stop-color='#080'/><stop offset='.7' stop-color='#080'/><stop offset='1' stop-color='#000'/></linearGradient></defs><rect width='200' height='100' fill='url(#h)'/><rect width='200' height='100' fill='url(#v)' style='mix-blend-mode:screen'/></svg>";
   $('map').setAttribute('href','data:image/svg+xml,'+encodeURIComponent(m));document.documentElement.classList.add('lens');
 }
 scrollTo(0,0);
-if(!RM)(async()=>{busy=lock=true;dock.classList.add('busy','col');bar.style.width='62px';bar.style.opacity='0';
+if(!RM)(async()=>{busy=lock=true;dock.classList.add('busy','col');watch(2600);bar.style.width='62px';bar.style.opacity='0';
   await wait(400);await appear(dock.offsetWidth);dock.classList.remove('busy');busy=lock=false})();
 </script>
 </body>
